@@ -1,6 +1,14 @@
+import Skeleton from '../components/layout/Skeleton'
+
 function HomePage(){
     return(
-        <h1 className="text-blue-500 text-5xl">Home page</h1>
+        <>
+            <Skeleton>
+                <div className="container flex justify-center items-center h-screen">
+                    <h1 className='text-4xl text-blue-500'>Hello world</h1>
+                </div>
+            </Skeleton>
+        </>
     )
 }
 
