@@ -1,6 +1,12 @@
+import Skeleton from "@/components/layout/Skeleton"
+
 function LoginPage(){
     return(
-        <h1>Login Page</h1>
+         <Skeleton>
+            <div className="container flex justify-center items-center h-screen">
+                <h1 className='text-4xl text-blue-500'>Login Page</h1>
+            </div>
+        </Skeleton>
     )
 }
 
