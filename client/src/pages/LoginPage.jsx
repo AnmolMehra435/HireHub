@@ -2,6 +2,8 @@ import Skeleton from "@/components/layout/Skeleton"
 import { useForm } from 'react-hook-form'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from 'zod'
+import userAuthStore from "@/store/authStore"
+import useUIStore from "@/store/uiStore"
 
 const formSchema = z.object({
     email: z.email("Enter valid email"),
@@ -10,8 +12,20 @@ const formSchema = z.object({
 function LoginPage(){
     const { register, handleSubmit,reset, formState: { errors }} = useForm({resolver: zodResolver(formSchema),})
 
+    const setUser = userAuthStore((state) => state.setUser)
+    
+    const addNotification = useUIStore((state) => state.addNotification)
+
     const onSubmit = (data) => {
         console.log(data)
+        setUser({
+            email: data.email,
+            password: data.password
+        })
+        addNotification(
+            "Logged in successfully!",
+            "success"
+        )
         reset();
     }
     return(

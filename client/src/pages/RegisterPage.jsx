@@ -2,6 +2,7 @@ import Skeleton from "@/components/layout/Skeleton"
 import { useForm } from 'react-hook-form'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from 'zod'
+import useUIStore from "@/store/uiStore"
 
 const formSchema = z.object({
     username : z.string().min(2, {message: "Username should be greator than 2 characters"}),
@@ -23,8 +24,14 @@ const formSchema = z.object({
 function RegisterPage(){
     const { register, handleSubmit, reset, formState: { errors } } = useForm({resolver: zodResolver(formSchema), });
 
+    const addNotification = useUIStore((state) => state.addNotification)
+
     const onSubmit = (data) => {
         console.log(data);
+        addNotification(
+            "Account created successfull!",
+            "success"
+        )
         reset();
     }
     return(

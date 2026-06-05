@@ -5,7 +5,23 @@ import {
   SheetTrigger,
 } from "../ui/sheet";
 
+import userAuthStore from "@/store/authStore";
+import useUIStore from "@/store/uiStore";
+
 function Navbar() {
+  const user = userAuthStore((state) => state.user)
+  const isAuth = userAuthStore((state) => state.isAuthenticated)
+  const logout = userAuthStore((state) => state.logout)
+  const addNotification = useUIStore((state) => state.addNotification)
+
+  const handleLogout = () => {
+    addNotification(
+      "Logged out successfully",
+      "info"
+    )
+
+    logout();
+  }
   return (
     <nav className="w-full h-12 bg-violet-300">
       <div className="flex justify-between items-center h-full px-4">
@@ -27,9 +43,20 @@ function Navbar() {
           <a className="mr-6" href="#">
             Dashboard
           </a>
-
-          <Button className="mr-3">Login</Button>
-          <Button>Register</Button>
+          <div>
+            {!isAuth? (
+              <>
+              <Button className="mr-3">Login</Button>
+              <Button>Register</Button>
+              </>
+            ): (
+              <>
+              <span>{user.email}</span>
+              <Button onClick={handleLogout}>Logout</Button>
+              </>
+            )
+            }
+          </div>
         </div>
 
         {/* Mobile Navigation */}

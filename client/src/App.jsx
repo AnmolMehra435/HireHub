@@ -5,9 +5,12 @@ import RegisterPage from './pages/RegisterPage';
 import JobsPage from './pages/JobsPage';
 import JobDetailPage from './pages/JobDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
+import NotificationToast from './components/layout/NotificationToast';
 
 function App(){
     return(
+        <>
+        <NotificationToast/>
         <BrowserRouter>
             <Routes>
                 <Route path='/' element={<HomePage/>}/>
@@ -18,7 +21,7 @@ function App(){
                 <Route path='*' element={<NotFoundPage/>}/>
             </Routes>
         </BrowserRouter>
-          
+    </>
     )
 }
 
