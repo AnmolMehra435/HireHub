@@ -4,7 +4,7 @@ function HomePage(){
     return(
         <>
             <Skeleton>
-                <div className="container flex justify-center items-center h-screen">
+                <div className="flex justify-center items-center h-screen">
                     <h1 className='text-4xl text-blue-500'>Hello world</h1>
                 </div>
             </Skeleton>

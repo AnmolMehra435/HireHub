@@ -1,10 +1,32 @@
 import Skeleton from "@/components/layout/Skeleton"
+import { useForm } from 'react-hook-form'
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from 'zod'
 
+const formSchema = z.object({
+    email: z.email("Enter valid email"),
+    password: z.string().min(8, "Must be more than 8 characters").regex(/^(?=.*[0-9])(?=.*[!@#$%^&*]).+$/, "password must contain at least one number and one special character")
+})
 function LoginPage(){
+    const { register, handleSubmit,reset, formState: { errors }} = useForm({resolver: zodResolver(formSchema),})
+
+    const onSubmit = (data) => {
+        console.log(data)
+        reset();
+    }
     return(
          <Skeleton>
-            <div className="container flex justify-center items-center h-screen">
-                <h1 className='text-4xl text-blue-500'>Login Page</h1>
+            <div className="flex justify-center items-center h-screen flex-col">
+                <h1 className='text-4xl text-blue-500 mb-5'>Login Page</h1>
+                <form onSubmit = {handleSubmit(onSubmit)} className="flex flex-col">
+                    <label>Email</label>
+                    <input {...register('email')} placeholder="Enter your email" className="my-4 pl-2 border-2 border-gray-400"/>
+                    {errors.email && (<p className="text-red-500 mb-4">{errors.email.message}</p>)}
+                    <label>Password</label>
+                    <input {...register('password')} placeholder="Enter your password" className="my-4 pl-2 border-2 border-gray-400"/>
+                    {errors.password && <p className="text-red-500 mb-4">{errors.password.message}</p>}
+                    <button className="border-2 border-gray-400 w-max px-4 mx-auto cursor-pointer" type='submit'>Login</button>
+                </form>
             </div>
         </Skeleton>
     )
