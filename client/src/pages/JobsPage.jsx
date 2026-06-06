@@ -1,6 +1,10 @@
 import Skeleton from "@/components/layout/Skeleton"
 
 function JobsPage(){
+    
+    const { data, isLoading, error} = useJobs();
+    
+
     return(
          <Skeleton>
             <div className="container flex justify-center items-center h-screen">
