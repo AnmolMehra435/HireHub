@@ -1,8 +1,17 @@
 import Skeleton from "@/components/layout/Skeleton"
+import useJobs from "@/hooks/useJobs";
 
 function JobsPage(){
     
     const { data, isLoading, error} = useJobs();
+
+    if (isLoading) {
+    return <p>Loading...</p>;
+    }
+
+    if (error) {
+        return <p>Error loading jobs</p>;
+    }
     
 
     return(
