@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from 'zod'
 import useUIStore from "@/store/uiStore"
+import { Helmet } from "react-helmet-async"
 
 const formSchema = z.object({
     username : z.string().min(2, {message: "Username should be greator than 2 characters"}),
@@ -35,6 +36,10 @@ function RegisterPage(){
         reset();
     }
     return(
+        <>
+        <Helmet>
+            <title>Register</title>
+        </Helmet>
          <Skeleton>
             <div className="flex justify-center items-center h-screen flex-col w-min sm:w-full mx-auto">
                 <h1 className='text-4xl text-blue-500 mb-5'>Register page</h1>
@@ -87,6 +92,7 @@ function RegisterPage(){
                 </form>
             </div>
         </Skeleton>
+        </>
     )
 }
 

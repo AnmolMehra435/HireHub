@@ -5,6 +5,7 @@ import { z } from 'zod'
 import userAuthStore from "@/store/authStore"
 import useUIStore from "@/store/uiStore"
 import { useLocation, useNavigate } from "react-router-dom"
+import { Helmet } from "react-helmet-async"
 
 const formSchema = z.object({
     email: z.email("Enter valid email"),
@@ -60,6 +61,10 @@ function LoginPage(){
         })
     }
     return(
+        <>
+        <Helmet>
+            <title>Login</title>
+        </Helmet>
          <Skeleton>
             <div className="flex justify-center items-center h-screen flex-col">
                 <h1 className='text-4xl text-blue-500 mb-5'>Login Page</h1>
@@ -74,6 +79,7 @@ function LoginPage(){
                 </form>
             </div>
         </Skeleton>
+        </>
     )
 }
 

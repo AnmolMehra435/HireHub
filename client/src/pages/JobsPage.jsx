@@ -1,9 +1,10 @@
 import Skeleton from "@/components/layout/Skeleton"
 import useJobs from "@/hooks/useJobs";
+import { Helmet } from "react-helmet-async";
 
 function JobsPage(){
     
-    const { data, isLoading, error} = useJobs();
+    const { isLoading, error} = useJobs();
 
     if (isLoading) {
     return <p>Loading...</p>;
@@ -15,11 +16,16 @@ function JobsPage(){
     
 
     return(
+        <>
+        <Helmet>
+            <title>JobsPage</title>
+        </Helmet>
          <Skeleton>
             <div className="container flex justify-center items-center h-screen">
                 <h1 className='text-4xl text-blue-500'>Jobs Page</h1>
             </div>
         </Skeleton>
+        </>
     )
 }
 
