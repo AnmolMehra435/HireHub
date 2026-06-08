@@ -1,18 +1,18 @@
 import Skeleton from "@/components/layout/Skeleton"
-import useJobs from "@/hooks/useJobs";
+// import useJobs from "@/hooks/useJobs";
 import { Helmet } from "react-helmet-async";
 
 function JobsPage(){
     
-    const { isLoading, error} = useJobs();
+    // const { isLoading, error} = useJobs();
 
-    if (isLoading) {
-    return <p>Loading...</p>;
-    }
+    // if (isLoading) {
+    // return <p>Loading...</p>;
+    // }
 
-    if (error) {
-        return <p>Error loading jobs</p>;
-    }
+    // if (error) {
+    //     return <p>Error loading jobs</p>;
+    // }
     
 
     return(

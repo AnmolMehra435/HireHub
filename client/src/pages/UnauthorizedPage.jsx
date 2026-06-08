@@ -13,7 +13,7 @@ function UnauthorizedPage(){
     return(
         <>
          <Helmet>
-            <title>Unauthroized</title>
+            <title>Unauthorized</title>
          </Helmet>
             <Skeleton>
                 <div className="flex flex-col justify-center gap-8 items-center h-screen">
