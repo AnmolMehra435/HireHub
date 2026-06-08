@@ -4,29 +4,62 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from 'zod'
 import userAuthStore from "@/store/authStore"
 import useUIStore from "@/store/uiStore"
+import { useLocation, useNavigate } from "react-router-dom"
 
 const formSchema = z.object({
     email: z.email("Enter valid email"),
     password: z.string().min(8, "Must be more than 8 characters").regex(/^(?=.*[0-9])(?=.*[!@#$%^&*]).+$/, "password must contain at least one number and one special character")
 })
+
 function LoginPage(){
     const { register, handleSubmit,reset, formState: { errors }} = useForm({resolver: zodResolver(formSchema),})
+
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    console.log(location.state);
 
     const setUser = userAuthStore((state) => state.setUser)
     
     const addNotification = useUIStore((state) => state.addNotification)
 
+    const from = location.state?.from?.pathname;
+
+    const getDashboard = (role) => {
+        switch(role){
+            case "candidate":
+                return "/candidate/dashboard";
+
+            case "employer":
+                return "/employer/dashboard";
+
+            case "admin":
+                return "/admin/dashboard";
+            
+            default:
+                return "/";
+        }
+    }
+
+    const role = "candidate"
+
     const onSubmit = (data) => {
         console.log(data)
         setUser({
             email: data.email,
-            password: data.password
+            role
         })
         addNotification(
             "Logged in successfully!",
             "success"
         )
         reset();
+
+        const destination = from || getDashboard(role);
+
+        navigate(destination, {
+            replace: true,
+        })
     }
     return(
          <Skeleton>
