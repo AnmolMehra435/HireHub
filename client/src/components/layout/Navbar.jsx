@@ -74,8 +74,19 @@ function Navbar() {
                 <a href="#">Jobs</a>
                 <a href="#">Dashboard</a>
 
-                <Button>Login</Button>
-                <Button>Register</Button>
+                <div>
+                  {!isAuth? (
+                    <>
+                    <Button>Login</Button>
+                    <Button>Register</Button>
+                    </>
+                  ): (
+                    <>
+                     <span>{user.email}</span>
+                     <Button onClick={handleLogout}>Logout</Button>
+                    </>
+                  )}
+                </div>
               </div>
             </SheetContent>
           </Sheet>

@@ -17,8 +17,6 @@ function LoginPage(){
     const location = useLocation();
     const navigate = useNavigate();
 
-    console.log(location.state);
-
     const setUser = userAuthStore((state) => state.setUser)
     
     const addNotification = useUIStore((state) => state.addNotification)
