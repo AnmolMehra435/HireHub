@@ -3,27 +3,11 @@ import { User } from "./src/models/users.js";
 
 await connectDB();
 
-const newUser = await User.create({
-    name: "Mannat Sharma",
-    email: "Mannat2604@gmail.com",
-    password: "mannat@0434",
-    role: "candidate"
-})
-
-console.log(newUser);
-
-newUser.name = "Mannat"
-
-await newUser.save();
-
-const updatedUser = await User.findOne({
+const user = await User.findOne({
     email: "mannat2604@gmail.com"
 }).select("+password")
+console.log(user);
 
-if(newUser.password === updatedUser.password){
-    console.log("Hashed password is same");
-}else{
-    console.log("Password is different")
-}
 
-console.log(updatedUser);
+console.log(await user.comparePassword("mannat@0434"))
+

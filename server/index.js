@@ -1,6 +1,18 @@
-const app = require('./src/app.js');
-const port = process.env.PORT || 5000
+import { connectDB } from "./src/config/database.js";
+import { PORT } from "./src/config/env.js";
+import app from './src/app.js'
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`)
-})
+const startServer = async () => {
+    try{
+        await connectDB();
+
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        })
+    }catch(error){
+        console.error(error);
+        process.exit(1);
+    }
+}
+
+startServer();
