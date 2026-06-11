@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../config/env.js';
 import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from '../config/env.js';
 import { User } from '../models/users.js';
-import jwt from "jsonwebtoken"
 
 export const generateAccessToken = (userId, role) => {
     const token = jwt.sign(

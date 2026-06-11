@@ -12,14 +12,10 @@ const allowedFields = [
 ]
 
 export const createJobs = async (jobData, employerId) => {
-    try{
-        return await Job.create({
-            ...jobData,
-            postedBy: employerId
-        })
-    }catch{
-        throw new Error("Error occured")
-    }
+    return await Job.create({
+        ...jobData,
+        postedBy: employerId
+    });
 }
 
 export const getEmployerJobs = async (employerId, page, limit) => {

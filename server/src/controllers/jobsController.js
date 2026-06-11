@@ -37,8 +37,7 @@ export const getMyJobs = async (req, res) => {
     })
 }
 
-export const updateJobController = async (req,res) 
-=> {
+export const updateJobController = async (req,res)=> {
     const result = updateJobSchema.safeParse(req.body);
     
     if(!result.success){

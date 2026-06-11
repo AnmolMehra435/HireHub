@@ -1,8 +1,6 @@
 import { User } from "../models/users.js";
-import { generateAccessToken,generateRefreshToken, removeRefreshToken, saveRefreshToken } from "../services/authServices.js";
+import { generateAccessToken,generateRefreshToken, removeRefreshToken, saveRefreshToken, verifyAndRotateRefreshToken } from "../services/authServices.js";
 import { registerSchema, loginSchema } from "../validations/authValidation.js";
-
-import { verifyAndRotateRefreshToken } from "../services/tokenServices.js";
 
 export const register = async (req, res) => {
     const result = registerSchema.safeParse(req.body);
