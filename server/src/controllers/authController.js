@@ -1,6 +1,8 @@
 import { User } from "../models/users.js";
-import { generateAccessToken,generateRefreshToken, saveRefreshToken } from "../services/authServices";
+import { generateAccessToken,generateRefreshToken, removeRefreshToken, saveRefreshToken } from "../services/authServices.js";
 import { registerSchema, loginSchema } from "../validations/authValidation.js";
+
+import { verifyAndRotateRefreshToken } from "../services/tokenServices.js";
 
 export const register = async (req, res) => {
     const result = registerSchema.safeParse(req.body);
@@ -110,6 +112,59 @@ export const login = async (req, res) => {
     }else{
         return res.status(401).json({
             "message": "Unauthorized"
+        })
+    }
+}
+
+export const logout = async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if(refreshToken){
+        const user = await User.findOne({
+            refreshTokens: refreshToken
+        });
+
+        if(user){
+            await removeRefreshToken(user._id, refreshToken);
+        }
+    }
+
+    res.clearCookie("refreshToken");
+
+    return res.status(200).json({
+        success: true,
+        message: "Logged out successfully"
+    })
+}
+
+
+export const refresh = async (req , res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if(!refreshToken){
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
+        })
+    }
+
+    try{
+        const newTokens = await verifyAndRotateRefreshToken(refreshToken);
+
+        res.cookie("refreshToken", newTokens.refreshToken, {
+            httpOnly: true,
+            sameSite: "strict",
+            secure: false,
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+
+        return res.status(201).json({
+            success: true,
+            accessToken: newTokens.accessToken
+        })
+    }catch(error){
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
         })
     }
 }
