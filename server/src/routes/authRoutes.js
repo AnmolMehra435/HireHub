@@ -9,16 +9,4 @@ router.post("/login", login);
 router.post('/logout', logout);
 router.post('/refresh', refresh )
 
-router.get("/profile", authenticate, (req, res) => {
-    res.json({
-        user: req.user
-    })
-})
-
-router.get("/candidate", authenticate, verifyRole(["candidate"]), (req, res) => {
-    res.json({
-        message: "Welcome candidate"
-    })
-})
-
 export default router
