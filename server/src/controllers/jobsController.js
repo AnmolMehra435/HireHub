@@ -155,7 +155,7 @@ export const getJobs = async (req, res) => {
 
     const totalPages = Math.ceil(totalJobs/limit);
     const hasPrevPage = page > 1;
-    const hasNextPage = page < totalPage;
+    const hasNextPage = page < totalPages;
 
     const pagination = {
         currentPage: page,
