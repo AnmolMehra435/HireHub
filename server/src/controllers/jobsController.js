@@ -12,10 +12,9 @@ export const createJobController = async (req, res) => {
             })
         }
 
-
     const job = await createJobs(
         result.data,
-        req.user.id
+        req.user.userId
     );
 
     return res.status(201).json({
@@ -25,7 +24,7 @@ export const createJobController = async (req, res) => {
 }
 
 export const getMyJobs = async (req, res) => {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
@@ -48,7 +47,7 @@ export const updateJobController = async (req,res)=> {
     }
 
     const jobId = req.params.id;
-    const employerId = req.user.id;
+    const employerId = req.user.userId;
     const updateData = result.data;
 
     const newJob = await updateJob(employerId, jobId, updateData);
@@ -68,7 +67,7 @@ export const updateJobController = async (req,res)=> {
 
 export const closeJobController = async (req, res) => {
     const jobId = req.params.id;
-    const employerId = req.user.id;
+    const employerId = req.user.userId;
     
     const closedJob = await closeJobs(employerId, jobId);
 
