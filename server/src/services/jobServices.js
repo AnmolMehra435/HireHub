@@ -61,3 +61,17 @@ export const closeJobs = async (employerId, jobId) => {
         }
     )
 }
+
+export const getSingleJob = (jobId) => {
+    return Job.findById(jobId).populate("postedBy", "name");
+}
+
+export const getJob = (query, skip, limit) => {
+
+    return Job.find(query).populate("postedBy", "name").sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+}
+
+export const countJobs = (query) => {
+    return Job.countDocuments(query);
+}

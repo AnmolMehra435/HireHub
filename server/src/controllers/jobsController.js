@@ -1,4 +1,5 @@
-import { getEmployerJobs, closeJobs, createJobs, updateJob } from "../services/jobServices.js";
+import { Job } from "../models/jobs.js";
+import { getEmployerJobs, closeJobs, createJobs, updateJob, getSingleJob, getJob, countJobs } from "../services/jobServices.js";
 import { createJobSchema, updateJobSchema } from "../validations/jobsValidation.js";
 
 export const createJobController = async (req, res) => {
@@ -83,3 +84,143 @@ export const closeJobController = async (req, res) => {
         closedJob
     })
 }
+
+export const getOneJob = async (req, res) => {
+    const jobId = req.params.id;
+
+    const job = await getSingleJob(jobId);
+
+    if(!job || job.status !== "open" ){
+        return res.status(404).json({
+            success: false,
+            "message": "Page not found"
+        })
+    }
+
+    return res.status(200).json({
+        success: true,
+        job,
+        hasApplied: false
+    })
+}
+
+export const getJobs = async (req, res) => {
+
+    const search = req.query.search;
+    const location = req.query.location;
+    const type = req.query.type;
+    const experience = req.query.experience;
+    const category = req.query.category
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const query = {
+        status: "open"
+    }
+
+    if(type){
+        query.type = type;
+    }
+
+    if(experience){
+        query.experience = experience;
+    }
+
+    if(category){
+        query.category = category;
+    }
+
+    if(location){
+        query.location = {
+            $regex: location,
+            $options: "i"
+        }
+    }
+
+    if(search){
+        query.$text = {
+            $search: search
+        }
+    }
+
+    const skip = (page - 1) * limit;
+
+    const jobsPromise = getJob(query, skip, limit);
+    const countPromise = countJobs(query);
+
+    const [jobs, totalJobs] = await Promise.all([
+        jobsPromise,
+        countPromise
+    ])
+
+    const totalPages = Math.ceil(totalJobs/limit);
+    const hasPrevPage = page > 1;
+    const hasNextPage = page < totalPage;
+
+    const pagination = {
+        currentPage: page,
+        totalPages,
+        totalJobs,
+        hasNextPage,
+        hasPrevPage
+    }
+
+    res.status(200).json({ 
+        jobs,
+        pagination
+     });
+}
+
+
+export const getStats = async (req, res) => {
+    const last7Days = new Date();
+    last7Days.setDate(last7Days.getDate() - 7)
+
+    const [stats] = await Job.aggregate([
+        {
+            $match: {
+                status: "open"
+            }
+        },
+        {
+            $facet: {
+                totalJobs: [
+                    {
+                        $count: "count"
+                    }
+                ],
+                jobsByCategory: [
+                    {
+                        $group: {
+                            _id: "$category",
+                            count: {
+                                $sum: 1
+                            }
+                        }
+                    }
+                ],
+                recentJobs: [
+                    {
+                        $match: {
+                            createdAt: {
+                                $gte: last7Days
+                            }
+                        }
+                    },
+                    {
+                        $count: "count"
+                    }
+                ]
+            }
+        }
+    ])
+
+    res.status(200).json({
+        success: true,
+        stats: {
+            totalJobs: stats.totalJobs[0]?.count || 0,
+            jobsByCategory: stats.jobsByCategory,
+            recentJobs: stats.recentJobs[0]?.count || 0
+        }
+    })
+} 
