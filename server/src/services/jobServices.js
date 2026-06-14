@@ -86,3 +86,12 @@ export const incrementApplicationCount = async (jobId) => {
         }
     )
 }
+
+export const verifyJob = (jobId, employerId) => {
+    return Job.findOne(
+        {
+            _id: jobId,
+            postedBy: employerId
+        }
+    )
+}

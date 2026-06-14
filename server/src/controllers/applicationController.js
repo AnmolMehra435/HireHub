@@ -1,5 +1,5 @@
-import { getSingleJob, incrementApplicationCount } from "../services/jobServices.js";
-import { applytoJobs } from "../services/applicationServices.js";
+import { getSingleJob, incrementApplicationCount, verifyJob } from "../services/jobServices.js";
+import { applytoJobs, getMyApplications, getJobApplicants, getOwnedApplication, updateApplication } from "../services/applicationServices.js";
 
 export const applyJob = async (req, res) => {
     const job = req.params.jobId;
@@ -49,4 +49,78 @@ export const applyJob = async (req, res) => {
 
         throw error;
     }
+}
+
+export const myApplications = async (req, res) => {
+    const userId = req.user.userId;
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    const skip = (page - 1) * limit;
+
+    const applications = await getMyApplications(userId, skip, limit);
+
+    if(applications.length === 0){
+        return res.status(400).json({
+            success: false,
+            message: "Not found"
+        })
+    }
+
+    return res.status(200).json({
+        success: true,
+        applications
+    })
+}
+
+export const getJobApplications = async (req, res) => {
+    const jobId = req.params.jobId;
+    const employerId = req.user.userId;
+
+    const exists = await verifyJob(jobId, employerId);
+
+    if(!exists){
+        return res.status(403).json({
+            success: false,
+            message: "Not found"
+        })
+    };
+
+    const applicants = await getJobApplicants(jobId);
+
+    return res.status(200).json({
+        success: true,
+        applicants
+    })
+}
+
+export const updateApplicationStatus = async (Req, res) => {
+    const applicationId = req.params.applicationId;
+    const employerId = req.user.userId;
+    const status = req.body.status;
+
+    const application = await getOwnedApplication(applicationId, employerId)
+
+    if(!application){
+        return res.status(403).json({
+            success: false,
+            message: "Not found"
+        })
+    }
+
+    const allowedStatus = ["pending", "shortlisted", "reviewing","rejected","selected"];
+
+    if(!allowedStatus.includes(status)){
+        return res.status(400).json({
+            success: false,
+            message: "Not found"
+        })
+    }
+
+    await updateApplication(applicationId, status);
+
+    return res.status(200).json({
+        success: true,
+        application
+    });
 }
