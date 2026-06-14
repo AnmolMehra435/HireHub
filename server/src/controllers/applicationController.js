@@ -1,9 +1,10 @@
-import { getSingleJob } from "../services/jobServices.js";
+import { getSingleJob, incrementApplicationCount } from "../services/jobServices.js";
+import { applytoJobs } from "../services/applicationServices.js";
 
 export const applyJob = async (req, res) => {
     const job = req.params.jobId;
     const user = req.user.userId;
-    const resume = req.file.path;
+    const resume = req.file?.path;
     const coverLetter = req.body.coverLetter;
 
     const existingJob = await getSingleJob(job);
@@ -29,11 +30,23 @@ export const applyJob = async (req, res) => {
         })
     }
 
-    const application = await applytoJobs(job, user, resume, coverLetter);
+    try{
+        const application = await applytoJobs(job, user, resume, coverLetter);
 
-    return res.status(200).json({
-        success: true,
-        message: "Application submited"
-    })
+        await incrementApplicationCount(job);
 
+        return res.status(201).json({
+            success: true,
+            application
+        })
+    }catch(error){
+        if(error.code === 11000){
+            return res.status(400).json({
+                success: false,
+                message: "You have already applied to this job"
+            })
+        }
+
+        throw error;
+    }
 }

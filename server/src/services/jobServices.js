@@ -75,3 +75,14 @@ export const getJob = (query, skip, limit) => {
 export const countJobs = (query) => {
     return Job.countDocuments(query);
 }
+
+export const incrementApplicationCount = async (jobId) => {
+    return await Job.findOneAndUpdate(
+        { _id: jobId },
+        {
+            $inc:{
+                applicationCount: 1
+            }
+        }
+    )
+}
