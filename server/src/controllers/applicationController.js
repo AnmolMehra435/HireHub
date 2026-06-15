@@ -94,7 +94,7 @@ export const getJobApplications = async (req, res) => {
     })
 }
 
-export const updateApplicationStatus = async (Req, res) => {
+export const updateApplicationStatus = async (req, res) => {
     const applicationId = req.params.applicationId;
     const employerId = req.user.userId;
     const status = req.body.status;

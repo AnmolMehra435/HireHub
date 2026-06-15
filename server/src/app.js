@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from 'cookie-parser'
 import authRouter from "./routes/authRoutes.js"
 import jobsRouter from "./routes/jobsRoutes.js"
-import applicationRouter from "./routes/applicationRouts.js"
+import applicationRouter from "./routes/applicationRoutes.js"
 const app = express();
 
 app.use(express.json());
