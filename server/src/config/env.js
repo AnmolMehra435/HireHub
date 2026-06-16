@@ -11,7 +11,10 @@ const requiredEnvVars = [
     "REFRESH_TOKEN_EXPIRY",
     "CLOUDINARY_CLOUD_NAME",
     "CLOUDINARY_API_KEY",
-    "CLOUDINARY_API_SECRET"
+    "CLOUDINARY_API_SECRET",
+    "EMAIL_USER",
+    "EMAIL_PASS",
+    "EMAIL_ENABLED"
 ];
 
 for(const variable of requiredEnvVars){
@@ -32,3 +35,6 @@ export const REFRESH_TOKEN_EXPIRY = process.env.REFRESH_TOKEN_EXPIRY
 export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY
 export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET
+export const EMAIL_USER = process.env.EMAIL_USER;
+export const EMAIL_PASS = process.env.EMAIL_PASS;
+export const EMAIL_ENABLED = process.env.EMAIL_ENABLED;
