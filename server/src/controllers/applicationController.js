@@ -133,7 +133,7 @@ export const updateApplicationStatus = async (req, res) => {
     const jobTitle = application.job.title;
     const candidateEmail = application.candidate.email;
 
-    const allowedStatus = ["pending", "shortlisted", "reviewing","rejected","selected"];
+    const allowedStatus = ["pending", "shortlisted", "reviewed","rejected","selected"];
 
     if(!allowedStatus.includes(status)){
         return res.status(400).json({
