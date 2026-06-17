@@ -1,4 +1,4 @@
-import { Job } from "../models/jobs.js";
+import { Job } from "../models/jobs.js";    
 
 const allowedFields = [
     "title",
@@ -63,7 +63,7 @@ export const closeJobs = async (employerId, jobId) => {
 }
 
 export const getSingleJob = (jobId) => {
-    return Job.findById(jobId).populate("postedBy", "name");
+    return Job.findById(jobId).populate("postedBy", "name email");
 }
 
 export const getJob = (query, skip, limit) => {

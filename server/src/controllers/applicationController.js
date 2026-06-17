@@ -1,5 +1,7 @@
 import { getSingleJob, incrementApplicationCount, verifyJob } from "../services/jobServices.js";
 import { applytoJobs, getMyApplications, getJobApplicants, getOwnedApplication, updateApplication } from "../services/applicationServices.js";
+import { User } from "../models/users.js";
+import { sendApplicationConfirmation, sendNewApplicationAlert, sendApplicationStatusUpdate } from "../services/emailService.js";
 
 export const applyJob = async (req, res) => {
     const job = req.params.jobId;
@@ -30,10 +32,30 @@ export const applyJob = async (req, res) => {
         })
     }
 
+
     try{
         const application = await applytoJobs(job, user, resume, coverLetter);
 
         await incrementApplicationCount(job);
+
+        const candidate = await User.findById(user).select("email name");
+        const jobTitle = existingJob.title;
+        const companyName = existingJob.company;
+        const employerEmail = existingJob.postedBy.email
+        const candidateEmail = candidate.email;
+        const candidateName = candidate.name;
+
+        sendApplicationConfirmation(
+            candidateEmail,
+            jobTitle,
+            companyName
+        );
+
+        sendNewApplicationAlert(
+            employerEmail,
+            candidateName,
+            jobTitle
+        );
 
         return res.status(201).json({
             success: true,
@@ -99,7 +121,7 @@ export const updateApplicationStatus = async (req, res) => {
     const employerId = req.user.userId;
     const status = req.body.status;
 
-    const application = await getOwnedApplication(applicationId, employerId)
+    const application = await getOwnedApplication(applicationId, employerId);
 
     if(!application){
         return res.status(403).json({
@@ -107,6 +129,9 @@ export const updateApplicationStatus = async (req, res) => {
             message: "Not found"
         })
     }
+
+    const jobTitle = application.job.title;
+    const candidateEmail = application.candidate.email;
 
     const allowedStatus = ["pending", "shortlisted", "reviewing","rejected","selected"];
 
@@ -118,6 +143,12 @@ export const updateApplicationStatus = async (req, res) => {
     }
 
     await updateApplication(applicationId, status);
+
+    sendApplicationStatusUpdate(
+        candidateEmail,
+        jobTitle,
+        status
+    );
 
     return res.status(200).json({
         success: true,
