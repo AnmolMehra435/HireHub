@@ -2,8 +2,22 @@ import Skeleton from '../components/layout/Skeleton'
 import { Helmet } from 'react-helmet-async'
 import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react';
+import { io } from "socket.io-client";
 
 function HomePage(){
+
+    useEffect(() => {
+        const socket = io("http://localhost:5000");
+
+        socket.on("welcome", (message) => {
+            console.log(message)
+        })
+
+        return () => {
+            socket.disconnect();
+        }
+    })
 
     const navigate = useNavigate();
 
