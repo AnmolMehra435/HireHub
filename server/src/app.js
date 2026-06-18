@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser'
 import authRouter from "./routes/authRoutes.js"
 import jobsRouter from "./routes/jobsRoutes.js"
 import applicationRouter from "./routes/applicationRoutes.js"
+import { notifyEmployer } from "./services/notification.js";
 const app = express();
 
 app.use(express.json());
@@ -17,7 +18,11 @@ app.use("/api/auth", authRouter)
 app.use("/api/application", applicationRouter)
 
 app.get('/api/health', (req, res) => {
+
+    notifyEmployer("employer123", "app123", "job123");
+
     res.json({
+        success: true,
         "message": "server is running"
     })
 })

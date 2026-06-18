@@ -3,21 +3,28 @@ import { Helmet } from 'react-helmet-async'
 import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react';
-import { io } from "socket.io-client";
+import { io } from "socket.io-client"
 
 function HomePage(){
 
     useEffect(() => {
-        const socket = io("http://localhost:5000");
+        const socket = io("http://localhost:5000", {
+            auth: {
+                token: {
+                    user: "employer123",
+                    role: "employer"
+                }
+            }
+        });
 
-        socket.on("welcome", (message) => {
-            console.log(message)
+        socket.on("applicationRecieved", (payload) => {
+            console.log(payload)
         })
 
         return () => {
             socket.disconnect();
         }
-    })
+    }, [])
 
     const navigate = useNavigate();
 

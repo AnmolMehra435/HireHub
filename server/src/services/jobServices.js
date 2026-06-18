@@ -63,7 +63,7 @@ export const closeJobs = async (employerId, jobId) => {
 }
 
 export const getSingleJob = (jobId) => {
-    return Job.findById(jobId).populate("postedBy", "name email");
+    return Job.findById(jobId).populate("postedBy", "_id name email");
 }
 
 export const getJob = (query, skip, limit) => {

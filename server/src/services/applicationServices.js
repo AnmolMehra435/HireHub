@@ -21,7 +21,7 @@ export const getJobApplicants = (jobId) => {
 export const getOwnedApplication = async (applicationId, employerId) => {
     const application = await Application.findOne({
         _id: applicationId,
-    }).populate("job", "postedBy title").populate("candidate", "email");
+    }).populate("job", "postedBy title").populate("candidate", "_id email");
 
     if(!application){
         return null

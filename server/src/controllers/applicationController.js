@@ -2,6 +2,7 @@ import { getSingleJob, incrementApplicationCount, verifyJob } from "../services/
 import { applytoJobs, getMyApplications, getJobApplicants, getOwnedApplication, updateApplication } from "../services/applicationServices.js";
 import { User } from "../models/users.js";
 import { sendApplicationConfirmation, sendNewApplicationAlert, sendApplicationStatusUpdate } from "../services/emailService.js";
+import { notifyEmployer, notifyCandidate } from "../services/notification.js";
 
 export const applyJob = async (req, res) => {
     const job = req.params.jobId;
@@ -44,6 +45,12 @@ export const applyJob = async (req, res) => {
         const employerEmail = existingJob.postedBy.email
         const candidateEmail = candidate.email;
         const candidateName = candidate.name;
+
+        notifyEmployer(
+            existingJob.postedBy._id,
+            application._id,
+            job
+        );
 
         sendApplicationConfirmation(
             candidateEmail,
@@ -143,6 +150,8 @@ export const updateApplicationStatus = async (req, res) => {
     }
 
     await updateApplication(applicationId, status);
+
+    notifyCandidate(application.candidate._id, applicationId, status);  
 
     sendApplicationStatusUpdate(
         candidateEmail,

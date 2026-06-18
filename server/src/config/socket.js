@@ -18,8 +18,8 @@ export const initializeSocket = (server) => {
         console.log("Received:", token);
 
         socket.user = {
-            userId: "employer123",
-            role: "employer"
+            userId: token.user,
+            role: token.role
         };
 
         next();
