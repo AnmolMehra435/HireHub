@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { verifyJWTfunc } from "../services/jwt.js";
 
 let io;
 
@@ -10,14 +11,28 @@ export const initializeSocket = (server) => {
         },
     });
 
+    io.use((socket, next) => {
+
+        const token = socket.handshake.auth.token;
+
+        console.log("Received:", token);
+
+        socket.user = {
+            userId: "employer123",
+            role: "employer"
+        };
+
+        next();
+    });
+
     io.on("connection", (socket) => {
-        console.log("Connected:", socket.id);
 
-        socket.on("disconnect", () => {
-            console.log("Disconnected:", socket.id);
-        });
+        socket.join(socket.user.userId);
 
-        socket.emit("welcome", "Welcome to HireHub Server");
+        console.log(
+            `Socket ${socket.id} joined room ${socket.user.userId}`
+        );
+
     });
 
     return io;
