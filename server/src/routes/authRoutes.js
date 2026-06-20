@@ -1,12 +1,14 @@
 import express from "express";
 import { login, logout, refresh, register } from "../controllers/authController.js";
-import { authenticate } from "../middleware/verifyJWT.js";
-import { verifyRole } from "../middleware/verifyRoles.js";
+import { authLimiter } from "../middleware/rateLimiting.js";
+
+
 const router = express.Router();
 
-router.post("/register", register);
-router.post("/login", login);
+
+router.post("/register", authLimiter, register);
+router.post("/login", authLimiter, login);
 router.get('/logout', logout);
-router.get('/refresh', refresh )
+router.get('/refresh', authLimiter, refresh )
 
 export default router
