@@ -1,9 +1,19 @@
 import { z } from "zod";
 
 const salarySchema = z.object({
-    min: z.number().nonnegative(),
-    max: z.number().nonnegative(),
-    currency: z.string().min(1)
+    min: z.number()
+        .nonnegative()
+        .max(100000000, "Salary cannot exceed 10 crore"),
+
+    max: z.number()
+        .nonnegative()
+        .max(100000000, "Salary cannot exceed 10 crore"),
+
+    currency: z.enum([
+        "INR",
+        "USD",
+        "EUR"
+    ])
 }).refine(
     (salary) => salary.max >= salary.min,
     {
@@ -13,10 +23,25 @@ const salarySchema = z.object({
 );
 
 export const createJobSchema = z.object({
-    title: z.string().min(1),
-    description: z.string().min(1),
-    company: z.string().min(1),
-    location: z.string().min(1),
+    title: z.string()
+        .trim()
+        .min(3, "Title must be at least 3 characters")
+        .max(100, "Title cannot exceed 100 characters"),
+
+    description: z.string()
+        .trim()
+        .min(20, "Description must be at least 20 characters")
+        .max(5000, "Description cannot exceed 5000 characters"),
+
+    company: z.string()
+        .trim()
+        .min(2, "Company name must be at least 2 characters")
+        .max(100, "Company name cannot exceed 100 characters"),
+
+    location: z.string()
+        .trim()
+        .min(2, "Location must be at least 2 characters")
+        .max(100, "Location cannot exceed 100 characters"),
 
     type: z.enum([
         "full-time",
@@ -35,10 +60,18 @@ export const createJobSchema = z.object({
     salary: salarySchema,
 
     skills: z.array(
-        z.string().min(1)
-    ).min(1),
+        z.string()
+            .trim()
+            .min(1, "Skill cannot be empty")
+            .max(30, "Skill cannot exceed 30 characters")
+    )
+    .min(1, "At least one skill is required")
+    .max(20, "Maximum 20 skills allowed"),
 
-    category: z.string().min(1),
+    category: z.string()
+        .trim()
+        .min(2, "Category must be at least 2 characters")
+        .max(50, "Category cannot exceed 50 characters"),
 
     deadline: z.coerce.date().refine(
         (date) => date > new Date(),
@@ -49,9 +82,23 @@ export const createJobSchema = z.object({
 });
 
 export const updateJobSchema = z.object({
-    title: z.string().min(1).optional(),
-    description: z.string().min(1).optional(),
-    location: z.string().min(1).optional(),
+    title: z.string()
+        .trim()
+        .min(3)
+        .max(100)
+        .optional(),
+
+    description: z.string()
+        .trim()
+        .min(20)
+        .max(5000)
+        .optional(),
+
+    location: z.string()
+        .trim()
+        .min(2)
+        .max(100)
+        .optional(),
 
     type: z.enum([
         "full-time",
@@ -70,10 +117,20 @@ export const updateJobSchema = z.object({
     salary: salarySchema.optional(),
 
     skills: z.array(
-        z.string().min(1)
-    ).min(1).optional(),
+        z.string()
+            .trim()
+            .min(1)
+            .max(30)
+    )
+    .min(1)
+    .max(20)
+    .optional(),
 
-    category: z.string().min(1).optional(),
+    category: z.string()
+        .trim()
+        .min(2)
+        .max(50)
+        .optional(),
 
     deadline: z.coerce.date()
         .refine(
