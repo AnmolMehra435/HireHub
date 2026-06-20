@@ -3,10 +3,11 @@ import { applyJob, myApplications, getJobApplications, updateApplicationStatus }
 import { authenticate } from "../middleware/verifyJWT.js";
 import { verifyRole } from "../middleware/verifyRoles.js";
 import { upload } from "../middleware/multer.js"
+import { applyLimiter } from "../middleware/rateLimiting.js";
 
 const router = express.Router();
 
-router.post("/:jobId/apply", authenticate, verifyRole(["candidate"]), upload.single("resume"), applyJob);
+router.post("/:jobId/apply", applyJob, authenticate, verifyRole(["candidate"]), upload.single("resume"), applyJob);
 
 router.get("/me", authenticate, verifyRole(["candidate"]), myApplications);
 

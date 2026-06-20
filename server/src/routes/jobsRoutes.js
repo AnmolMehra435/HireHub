@@ -2,6 +2,7 @@ import express from "express";
 import { authenticate } from "../middleware/verifyJWT.js";
 import { verifyRole } from "../middleware/verifyRoles.js";
 import { createJobController, updateJobController, getMyJobs, closeJobController, getOneJob , getJobs, getStats} from "../controllers/jobsController.js";
+import { jobLimiter } from "../middleware/rateLimiting.js";
 
 const router = express.Router();
 
@@ -16,10 +17,10 @@ router.delete('/:id', authenticate, verifyRole(["employer"]), closeJobController
 
 //public routes
 
-router.get('/:id', getOneJob);
+router.get('/:id', jobLimiter, getOneJob);
 
-router.get('/', getJobs);
+router.get('/', jobLimiter, getJobs);
 
-router.get('/stats', getStats);
+router.get('/stats', jobLimiter, getStats);
 
 export default router;
