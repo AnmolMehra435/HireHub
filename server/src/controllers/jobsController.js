@@ -1,16 +1,14 @@
 import { Job } from "../models/jobs.js";
 import { getEmployerJobs, closeJobs, createJobs, updateJob, getSingleJob, getJob, countJobs } from "../services/jobServices.js";
 import { createJobSchema, updateJobSchema } from "../validations/jobsValidation.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 export const createJobController = async (req, res) => {
 
     const result = createJobSchema.safeParse(req.body);
     
         if(!result.success){
-            return res.status(400).json({
-                success: false,
-                message: "Invalid Entry"
-            })
+            return sendError(res, 400, "Invalid Entry")
         }
 
     const job = await createJobs(
@@ -18,10 +16,7 @@ export const createJobController = async (req, res) => {
         req.user.userId
     );
 
-    return res.status(201).json({
-        success: true,
-        job
-    })
+    return sendSuccess(res, 201, "Job created Succesfully", {job})
 }
 
 export const getMyJobs = async (req, res) => {
@@ -31,20 +26,14 @@ export const getMyJobs = async (req, res) => {
 
     const jobs = await getEmployerJobs(userId, page, limit);
     
-    return res.status(200).json({
-        success: true,
-        jobs
-    })
+    return sendSuccess(res, 200, "Jobs fetched successfully", {jobs})
 }
 
 export const updateJobController = async (req,res)=> {
     const result = updateJobSchema.safeParse(req.body);
     
     if(!result.success){
-        return res.status(400).json({
-            success: false,
-            message: "Invalid Entry"
-        })
+        return sendError(res, 400, "Invalid Entry")
     }
 
     const jobId = req.params.id;
@@ -54,16 +43,10 @@ export const updateJobController = async (req,res)=> {
     const newJob = await updateJob(employerId, jobId, updateData);
 
     if(!newJob){
-        return res.status(404).json({
-            success: false,
-            "message": "not found"
-        })
+        return sendError(res, 404, "Not Found")
     }
 
-    return res.status(200).json({
-        success: true,
-        newJob
-    })
+    return sendSuccess(res, 200, "Job updated successfully", {newJob})
 }
 
 export const closeJobController = async (req, res) => {
@@ -73,16 +56,10 @@ export const closeJobController = async (req, res) => {
     const closedJob = await closeJobs(employerId, jobId);
 
     if(!closedJob){
-        return res.status(404).json({
-            success: false,
-            "message": "Not found"
-        })
+        return sendError(res, 404, "Not Found")
     }
 
-    return res.status(200).json({
-        success: true,
-        closedJob
-    })
+    return sendSuccess(res, 200, "Job closed", {closedJob})
 }
 
 export const getOneJob = async (req, res) => {
@@ -91,17 +68,10 @@ export const getOneJob = async (req, res) => {
     const job = await getSingleJob(jobId);
 
     if(!job || job.status !== "open" ){
-        return res.status(404).json({
-            success: false,
-            "message": "Page not found"
-        })
+        return sendError(res, 404, "Page not found")
     }
 
-    return res.status(200).json({
-        success: true,
-        job,
-        hasApplied: false
-    })
+    return sendSuccess(res, 200, "fetched Job", {job})
 }
 
 export const getJobs = async (req, res) => {
@@ -165,10 +135,10 @@ export const getJobs = async (req, res) => {
         hasPrevPage
     }
 
-    res.status(200).json({ 
-        jobs,
+    return sendSuccess(res, 200, "Fetched jobs", {
+        jobs, 
         pagination
-     });
+    })
 }
 
 
@@ -214,9 +184,8 @@ export const getStats = async (req, res) => {
             }
         }
     ])
-
-    res.status(200).json({
-        success: true,
+   
+    return sendSuccess(res, 200, "Calculated stats", {
         stats: {
             totalJobs: stats.totalJobs[0]?.count || 0,
             jobsByCategory: stats.jobsByCategory,

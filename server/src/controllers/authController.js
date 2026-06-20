@@ -1,15 +1,13 @@
 import { User } from "../models/users.js";
 import { generateAccessToken,generateRefreshToken, removeRefreshToken, saveRefreshToken, verifyAndRotateRefreshToken } from "../services/authServices.js";
 import { registerSchema, loginSchema } from "../validations/authValidation.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 export const register = async (req, res) => {
     const result = registerSchema.safeParse(req.body);
 
     if(!result.success){
-        return res.status(400).json({
-            success: false,
-            message: "Invalid user entry"
-        })
+        return sendError(res, 400, "Invalid user entry")
     }
 
     const name = result.data.name;
@@ -21,10 +19,7 @@ export const register = async (req, res) => {
     });
 
     if(duplicateUser){
-        return res.status(409).json({
-            success: false,
-            message: "Email alreaty registered"
-        })
+        return sendError(res, 409, "Email already registered")
     }
 
     const user = await User.create({
@@ -46,16 +41,15 @@ export const register = async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000
     })
 
-    return res.status(201).json({
-        success: true,
-        accessToken: accessToken,
-        user: {
+    return sendSuccess(res, 201, "Registered Successfully", 
+        { accessToken: accessToken, 
+          user: {
             id: user._id,
             email: user.email,
             name: user.name,
             role: user.role
-        }
-    })
+          }
+        })
 }
 
 
@@ -63,10 +57,7 @@ export const login = async (req, res) => {
     const result = loginSchema.safeParse(req.body);
 
     if(!result.success){
-        return res.status(400).json({
-            success: false,
-            message: "Invalid Entry"
-        })
+        return sendError(res, 400, "Invalid Entry")
     }
 
     const email = result.data.email;
@@ -77,9 +68,7 @@ export const login = async (req, res) => {
     }).select("+password")
 
     if(!user){
-        return res.status(401).json({
-            message: "Unauthorized"
-        })
+        return sendError(res, 401, "Unauthorized")
     }
 
     const match = await user.comparePassword(password);
@@ -97,8 +86,7 @@ export const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
-        return res.status(200).json({
-            success: true,
+        return sendSuccess(res, 200, "Login successful", {
             accessToken: accessToken,
             userData: {
                 userId: user._id,
@@ -107,10 +95,9 @@ export const login = async (req, res) => {
                 role: user.role
             }
         })
+
     }else{
-        return res.status(401).json({
-            "message": "Unauthorized"
-        })
+        return sendError(res, 401, "Unauthorized")
     }
 }
 
@@ -128,10 +115,7 @@ export const logout = async (req, res) => {
 
     res.clearCookie("refreshToken");
 
-    return res.status(200).json({
-        success: true,
-        message: "Logged out successfully"
-    })
+    return sendSuccess(res, 200, "Logout successful")
 }
 
 
@@ -139,10 +123,7 @@ export const refresh = async (req , res) => {
     const refreshToken = req.cookies.refreshToken;
 
     if(!refreshToken){
-        return res.status(401).json({
-            success: false,
-            message: "Unauthorized"
-        })
+        return sendError(res, 401, "Unauthorized")
     }
 
     try{
@@ -155,14 +136,11 @@ export const refresh = async (req , res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
-        return res.status(201).json({
-            success: true,
+        return sendSuccess(res, 200, "Refresh done", {
             accessToken: newTokens.accessToken
         })
+        
     }catch(error){
-        return res.status(401).json({
-            success: false,
-            message: "Unauthorized"
-        })
+        return sendError(res, 401, "Unauthorized")
     }
 }

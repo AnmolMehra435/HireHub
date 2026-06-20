@@ -3,6 +3,7 @@ import { applytoJobs, getMyApplications, getJobApplicants, getOwnedApplication, 
 import { User } from "../models/users.js";
 import { sendApplicationConfirmation, sendNewApplicationAlert, sendApplicationStatusUpdate } from "../services/emailService.js";
 import { notifyEmployer, notifyCandidate } from "../services/notification.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
 
 export const applyJob = async (req, res) => {
     const job = req.params.jobId;
@@ -13,24 +14,15 @@ export const applyJob = async (req, res) => {
     const existingJob = await getSingleJob(job);
 
     if(!existingJob){
-        return res.status(400).json({
-            success: false,
-            message: "Bad request"
-        })
+        return sendError(res, 400, "Bad Request")
     };
 
     if(existingJob.status !== "open"){
-        return res.status(400).json({
-            success: false,
-            message: "Bad request"
-        })
+        return sendError(res, 400, "Bad Request")
     };
 
     if(!resume){
-        return res.status(400).json({
-            success: false,
-            message: "Bad request"
-        })
+        return sendError(res, 400, "Bad Request")
     }
 
 
@@ -64,16 +56,10 @@ export const applyJob = async (req, res) => {
             jobTitle
         );
 
-        return res.status(201).json({
-            success: true,
-            application
-        })
+        return sendSuccess(res, 201, "Application created", {application})
     }catch(error){
         if(error.code === 11000){
-            return res.status(400).json({
-                success: false,
-                message: "You have already applied to this job"
-            })
+            return sendError(res, 400, "You have already applied to this job")
         }
 
         throw error;
@@ -90,16 +76,10 @@ export const myApplications = async (req, res) => {
     const applications = await getMyApplications(userId, skip, limit);
 
     if(applications.length === 0){
-        return res.status(400).json({
-            success: false,
-            message: "Not found"
-        })
+        return sendError(res, 400, "Bad Request")
     }
 
-    return res.status(200).json({
-        success: true,
-        applications
-    })
+    return sendSuccess(res, 200, "Fetched applications", {applications})
 }
 
 export const getJobApplications = async (req, res) => {
@@ -109,18 +89,12 @@ export const getJobApplications = async (req, res) => {
     const exists = await verifyJob(jobId, employerId);
 
     if(!exists){
-        return res.status(403).json({
-            success: false,
-            message: "Not found"
-        })
+        return sendError(res, 403, "Bad Request")
     };
 
     const applicants = await getJobApplicants(jobId);
 
-    return res.status(200).json({
-        success: true,
-        applicants
-    })
+    return sendSuccess(res, 200, "Fetched all applicants", {applicants})
 }
 
 export const updateApplicationStatus = async (req, res) => {
@@ -131,10 +105,7 @@ export const updateApplicationStatus = async (req, res) => {
     const application = await getOwnedApplication(applicationId, employerId);
 
     if(!application){
-        return res.status(403).json({
-            success: false,
-            message: "Not found"
-        })
+        return sendError(res, 404, "Not Found")
     }
 
     const jobTitle = application.job.title;
@@ -143,13 +114,10 @@ export const updateApplicationStatus = async (req, res) => {
     const allowedStatus = ["pending", "shortlisted", "reviewed","rejected","selected"];
 
     if(!allowedStatus.includes(status)){
-        return res.status(400).json({
-            success: false,
-            message: "Not found"
-        })
+        return sendError(res, 400, "Not found")
     }
 
-    await updateApplication(applicationId, status);
+    const updatedApplication = await updateApplication(applicationId, status);
 
     notifyCandidate(application.candidate._id, applicationId, status);  
 
@@ -159,8 +127,5 @@ export const updateApplicationStatus = async (req, res) => {
         status
     );
 
-    return res.status(200).json({
-        success: true,
-        application
-    });
+    return sendSuccess(res, 200, "Application updated successfully", { updatedApplication })
 }
