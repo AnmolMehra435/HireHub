@@ -5,10 +5,16 @@ import authRouter from "./routes/authRoutes.js"
 import jobsRouter from "./routes/jobsRoutes.js"
 import applicationRouter from "./routes/applicationRoutes.js"
 import { notifyEmployer } from "./services/notification.js";
+import { FRONTEND_URL } from "./config/env.js";
+import helmet from "helmet"
 const app = express();
 
+app.use(helmet())
+app.use(cors({
+    origin: FRONTEND_URL,
+    credentials: true
+}));
 app.use(express.json());
-app.use(cors());
 app.use(cookieParser())
 
 app.use("/api/jobs", jobsRouter)

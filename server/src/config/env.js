@@ -14,7 +14,8 @@ const requiredEnvVars = [
     "CLOUDINARY_API_SECRET",
     "EMAIL_USER",
     "EMAIL_PASS",
-    "EMAIL_ENABLED"
+    "EMAIL_ENABLED",
+    "FRONTEND_URL"
 ];
 
 for(const variable of requiredEnvVars){
@@ -38,3 +39,4 @@ export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET
 export const EMAIL_USER = process.env.EMAIL_USER;
 export const EMAIL_PASS = process.env.EMAIL_PASS;
 export const EMAIL_ENABLED = process.env.EMAIL_ENABLED;
+export const FRONTEND_URL = process.env.FRONTEND_URL;
