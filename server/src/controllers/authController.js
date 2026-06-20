@@ -2,58 +2,62 @@ import { User } from "../models/users.js";
 import { generateAccessToken,generateRefreshToken, removeRefreshToken, saveRefreshToken, verifyAndRotateRefreshToken } from "../services/authServices.js";
 import { registerSchema, loginSchema } from "../validations/authValidation.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-export const register = async (req, res) => {
-    const result = registerSchema.safeParse(req.body);
+export const register = asyncHandler( 
+        async (req, res) => {
+        const result = registerSchema.safeParse(req.body);
 
-    if(!result.success){
-        return sendError(res, 400, "Invalid user entry")
-    }
+        if(!result.success){
+            return sendError(res, 400, "Invalid user entry")
+        }
 
-    const name = result.data.name;
-    const email = result.data.email;
-    const password = result.data.password;
+        const name = result.data.name;
+        const email = result.data.email;
+        const password = result.data.password;
 
-    const duplicateUser = await User.findOne({
-        email: email
-    });
+        const duplicateUser = await User.findOne({
+            email: email
+        });
 
-    if(duplicateUser){
-        return sendError(res, 409, "Email already registered")
-    }
+        if(duplicateUser){
+            return sendError(res, 409, "Email already registered")
+        }
 
-    const user = await User.create({
-        name,
-        email,
-        password
-    })
-
-    const accessToken = generateAccessToken(user._id, user.role);
-
-    const refreshToken = generateRefreshToken(user._id);
-
-    await saveRefreshToken(user._id, refreshToken);
-
-    res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        sameSite: "strict",
-        secure: false,
-        maxAge: 7 * 24 * 60 * 60 * 1000
-    })
-
-    return sendSuccess(res, 201, "Registered Successfully", 
-        { accessToken: accessToken, 
-          user: {
-            id: user._id,
-            email: user.email,
-            name: user.name,
-            role: user.role
-          }
+        const user = await User.create({
+            name,
+            email,
+            password
         })
-}
+
+        const accessToken = generateAccessToken(user._id, user.role);
+
+        const refreshToken = generateRefreshToken(user._id);
+
+        await saveRefreshToken(user._id, refreshToken);
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            sameSite: "strict",
+            secure: false,
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+
+        return sendSuccess(res, 201, "Registered Successfully", 
+            { accessToken: accessToken, 
+            user: {
+                id: user._id,
+                email: user.email,
+                name: user.name,
+                role: user.role
+            }
+            })
+    }
+)
 
 
-export const login = async (req, res) => {
+export const login = asyncHandler( 
+    async (req, res) => {
     const result = loginSchema.safeParse(req.body);
 
     if(!result.success){
@@ -100,8 +104,10 @@ export const login = async (req, res) => {
         return sendError(res, 401, "Unauthorized")
     }
 }
+)
 
-export const logout = async (req, res) => {
+export const logout = asyncHandler(
+    async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     if(refreshToken){
         const user = await User.findOne({
@@ -117,9 +123,11 @@ export const logout = async (req, res) => {
 
     return sendSuccess(res, 200, "Logout successful")
 }
+)
 
 
-export const refresh = async (req , res) => {
+export const refresh = asyncHandler(
+    async (req , res) => {
     const refreshToken = req.cookies.refreshToken;
 
     if(!refreshToken){
@@ -144,3 +152,4 @@ export const refresh = async (req , res) => {
         return sendError(res, 401, "Unauthorized")
     }
 }
+)

@@ -16,11 +16,9 @@ router.put('/:id', authenticate, verifyRole(["employer"]), updateJobController);
 router.delete('/:id', authenticate, verifyRole(["employer"]), closeJobController);
 
 //public routes
+router.get('/', jobLimiter, getJobs);
+router.get('/stats', jobLimiter, getStats);
 
 router.get('/:id', jobLimiter, getOneJob);
-
-router.get('/', jobLimiter, getJobs);
-
-router.get('/stats', jobLimiter, getStats);
 
 export default router;

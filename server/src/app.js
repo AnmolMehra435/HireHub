@@ -7,6 +7,7 @@ import applicationRouter from "./routes/applicationRoutes.js"
 import { notifyEmployer } from "./services/notification.js";
 import { FRONTEND_URL } from "./config/env.js";
 import helmet from "helmet"
+import { errorHandler } from "./middleware/errorHandler.js";
 const app = express();
 
 app.use(helmet())
@@ -32,5 +33,7 @@ app.get('/api/health', (req, res) => {
         "message": "server is running"
     })
 })
+
+app.use(errorHandler)
 
 export default app;

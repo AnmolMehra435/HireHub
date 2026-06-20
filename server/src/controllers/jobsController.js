@@ -2,8 +2,9 @@ import { Job } from "../models/jobs.js";
 import { getEmployerJobs, closeJobs, createJobs, updateJob, getSingleJob, getJob, countJobs } from "../services/jobServices.js";
 import { createJobSchema, updateJobSchema } from "../validations/jobsValidation.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-export const createJobController = async (req, res) => {
+export const createJobController = asyncHandler(async (req, res) => {
 
     const result = createJobSchema.safeParse(req.body);
     
@@ -17,9 +18,9 @@ export const createJobController = async (req, res) => {
     );
 
     return sendSuccess(res, 201, "Job created Succesfully", {job})
-}
+})
 
-export const getMyJobs = async (req, res) => {
+export const getMyJobs = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -27,9 +28,9 @@ export const getMyJobs = async (req, res) => {
     const jobs = await getEmployerJobs(userId, page, limit);
     
     return sendSuccess(res, 200, "Jobs fetched successfully", {jobs})
-}
+})
 
-export const updateJobController = async (req,res)=> {
+export const updateJobController = asyncHandler(async (req,res)=> {
     const result = updateJobSchema.safeParse(req.body);
     
     if(!result.success){
@@ -47,9 +48,9 @@ export const updateJobController = async (req,res)=> {
     }
 
     return sendSuccess(res, 200, "Job updated successfully", {newJob})
-}
+})
 
-export const closeJobController = async (req, res) => {
+export const closeJobController = asyncHandler(async (req, res) => {
     const jobId = req.params.id;
     const employerId = req.user.userId;
     
@@ -60,9 +61,9 @@ export const closeJobController = async (req, res) => {
     }
 
     return sendSuccess(res, 200, "Job closed", {closedJob})
-}
+})
 
-export const getOneJob = async (req, res) => {
+export const getOneJob = asyncHandler(async (req, res) => {
     const jobId = req.params.id;
 
     const job = await getSingleJob(jobId);
@@ -72,9 +73,9 @@ export const getOneJob = async (req, res) => {
     }
 
     return sendSuccess(res, 200, "fetched Job", {job})
-}
+})
 
-export const getJobs = async (req, res) => {
+export const getJobs = asyncHandler(async (req, res) => {
 
     const search = req.query.search;
     const location = req.query.location;
@@ -139,10 +140,12 @@ export const getJobs = async (req, res) => {
         jobs, 
         pagination
     })
-}
+})
 
 
-export const getStats = async (req, res) => {
+export const getStats = asyncHandler(
+    async (req, res) => {
+
     const last7Days = new Date();
     last7Days.setDate(last7Days.getDate() - 7)
 
@@ -193,3 +196,4 @@ export const getStats = async (req, res) => {
         }
     })
 } 
+)

@@ -4,8 +4,9 @@ import { User } from "../models/users.js";
 import { sendApplicationConfirmation, sendNewApplicationAlert, sendApplicationStatusUpdate } from "../services/emailService.js";
 import { notifyEmployer, notifyCandidate } from "../services/notification.js";
 import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-export const applyJob = async (req, res) => {
+export const applyJob = asyncHandler(async (req, res) => {
     const job = req.params.jobId;
     const user = req.user.userId;
     const resume = req.file?.path;
@@ -64,9 +65,9 @@ export const applyJob = async (req, res) => {
 
         throw error;
     }
-}
+})
 
-export const myApplications = async (req, res) => {
+export const myApplications = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
@@ -80,9 +81,9 @@ export const myApplications = async (req, res) => {
     }
 
     return sendSuccess(res, 200, "Fetched applications", {applications})
-}
+})
 
-export const getJobApplications = async (req, res) => {
+export const getJobApplications = asyncHandler(async (req, res) => {
     const jobId = req.params.jobId;
     const employerId = req.user.userId;
 
@@ -95,9 +96,9 @@ export const getJobApplications = async (req, res) => {
     const applicants = await getJobApplicants(jobId);
 
     return sendSuccess(res, 200, "Fetched all applicants", {applicants})
-}
+})
 
-export const updateApplicationStatus = async (req, res) => {
+export const updateApplicationStatus = asyncHandler(async (req, res) => {
     const applicationId = req.params.applicationId;
     const employerId = req.user.userId;
     const status = req.body.status;
@@ -128,4 +129,4 @@ export const updateApplicationStatus = async (req, res) => {
     );
 
     return sendSuccess(res, 200, "Application updated successfully", { updatedApplication })
-}
+})
