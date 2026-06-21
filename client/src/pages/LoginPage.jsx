@@ -18,7 +18,7 @@ function LoginPage(){
     const location = useLocation();
     const navigate = useNavigate();
 
-    const setUser = userAuthStore((state) => state.setUser)
+    const login = userAuthStore((state) => state.login)
     
     const addNotification = useUIStore((state) => state.addNotification)
 
@@ -40,25 +40,28 @@ function LoginPage(){
         }
     }
 
-    const role = "candidate"
+    const onSubmit = async (data) => {
+        try{
+            const response = await login(data);
 
-    const onSubmit = (data) => {
-        console.log(data)
-        setUser({
-            email: data.email,
-            role
-        })
-        addNotification(
-            "Logged in successfully!",
-            "success"
-        )
-        reset();
+            addNotification(
+                "Logged in successfully!",
+                "success"
+            )
+            reset();
 
-        const destination = from || getDashboard(role);
+            const destination = from || getDashboard(response.data.userData.role);
 
-        navigate(destination, {
-            replace: true,
-        })
+            navigate(destination, {
+                replace: true,
+            })
+        }catch(error){
+            addNotification(
+                error.response?.data?.message ||
+                "Login failed",
+                "error"
+            )
+        }
     }
     return(
         <>

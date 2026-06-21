@@ -67,7 +67,7 @@ api.interceptors.response.use(
                     }
                 )
 
-                const newToken = refreshResponse.data.accessToken;
+                const newToken = refreshResponse.data.data.accessToken;
 
                 if(newToken){
                     userAuthStore.getState().setAccessToken(newToken);

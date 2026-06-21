@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from 'zod'
 import useUIStore from "@/store/uiStore"
 import { Helmet } from "react-helmet-async"
+import userAuthStore from "@/store/authStore"
+import { useNavigate } from "react-router-dom"
 
 const formSchema = z.object({
     username : z.string().min(2, {message: "Username should be greator than 2 characters"}),
@@ -12,9 +14,6 @@ const formSchema = z.object({
     .min(8, "Password must be at least 8 characters")
     .regex(/^(?=.*[0-9])(?=.*[!@#$%^&*]).+$/, "password must contain at least one number and one special character"),
     confirmPassword: z.string(),
-    role: z.enum(["candidate", "employer"], {
-        message: "Please select a role",
-    }),
 })
 .refine((data) => data.password === data.confirmPassword, {
     message: "Password do not match",
@@ -26,14 +25,52 @@ function RegisterPage(){
     const { register, handleSubmit, reset, formState: { errors } } = useForm({resolver: zodResolver(formSchema), });
 
     const addNotification = useUIStore((state) => state.addNotification)
+    const userRegister = userAuthStore((state) => state.register)
+    const navigate = useNavigate();
 
-    const onSubmit = (data) => {
-        console.log(data);
-        addNotification(
-            "Account created successfull!",
-            "success"
-        )
-        reset();
+    const getDashboard = (role) => {
+        switch(role){
+            case "candidate":
+                return "/candidate/dashboard";
+
+            case "employer":
+                return "/employer/dashboard";
+
+            case "admin":
+                return "/admin/dashboard";
+            
+            default:
+                return "/";
+        }
+    }
+
+    const onSubmit = async (data) => {
+
+        const payload = {
+            name: data.username,
+            email: data.email,
+            password: data.password
+        }
+
+        try{
+            const response = await userRegister(payload)
+            addNotification(
+                "Account created successfull!",
+                "success"
+            )
+            reset();
+
+            const destination = getDashboard(response.data.user.role);
+
+            navigate(destination)
+            
+        }catch(error){
+            addNotification(
+                error.response?.data?.message ||
+                "Register failed",
+                "error"
+            )
+        }
     }
     return(
         <>
@@ -73,21 +110,6 @@ function RegisterPage(){
                     </p>
                     )}
 
-                    <div className="mb-4 mx-auto border-2 border-gray-500">
-                        <select id="role" {...register('role')} defaultValue="">
-                            <option value="" disabled>
-                                Select your role
-                            </option>
-                            <option value='candidate'>
-                                Candidate
-                            </option>
-                            <option value="employer">
-                                Employer
-                            </option>
-                        </select>
-                    </div>
-                    {errors.role && (<p className="text-red-500 mb-4">{errors.role.message}</p>)}
-                    
                     <button type="submit" className="border-2 border-gray-400 w-max px-4 mx-auto cursor-pointer">Submit</button>
                 </form>
             </div>
