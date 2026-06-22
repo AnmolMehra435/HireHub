@@ -51,7 +51,7 @@ function Navbar() {
               </>
             ): (
               <>
-              <span>{user.email}</span>
+              <span>{user?.email}</span>
               <Button onClick={handleLogout}>Logout</Button>
               </>
             )
@@ -82,7 +82,7 @@ function Navbar() {
                     </>
                   ): (
                     <>
-                     <span>{user.email}</span>
+                     <span>{user?.email}</span>
                      <Button onClick={handleLogout}>Logout</Button>
                     </>
                   )}

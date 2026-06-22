@@ -1,7 +1,9 @@
 import Navbar from './Navbar'
 import Footer from './Footer';
+import useSocket from '@/hooks/useSocket';
 
 function Skeleton({children}){
+    useSocket()
     return(
         <>
             <Navbar/>

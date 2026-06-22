@@ -15,11 +15,11 @@ export const initializeSocket = (server) => {
 
         const token = socket.handshake.auth.token;
 
-        console.log("Received:", token);
+        const decoded = verifyJWTfunc(token)
 
         socket.user = {
-            userId: token.user,
-            role: token.role
+            userId: decoded.userId,
+            role: decoded.role
         };
 
         next();

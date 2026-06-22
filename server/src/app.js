@@ -11,6 +11,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 const app = express();
 
 app.use(helmet())
+console.log(FRONTEND_URL)
 app.use(cors({
     origin: FRONTEND_URL,
     credentials: true

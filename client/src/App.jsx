@@ -13,10 +13,12 @@ import RoleRoute from './routes/RoleRoute';
 import PublicRoute from './routes/PublicRoutes';
 import EmployerDashboard from './pages/EmployerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import AuthInitializer from './components/auth/AuthInitializer';
 
 function App(){
     return(
         <>
+        <AuthInitializer>
         <NotificationToast/>
         <BrowserRouter>
             <Routes>
@@ -48,6 +50,7 @@ function App(){
                 </Route>
             </Routes>
         </BrowserRouter>
+        </AuthInitializer>
     </>
     )
 }

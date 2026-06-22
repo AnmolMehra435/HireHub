@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import api from '@lib/api'
+import api from '../lib/api.js'
 
 const userAuthStore = create(
     persist(
@@ -8,6 +8,7 @@ const userAuthStore = create(
             user: null,
             isAuthenticated: false,
             accessToken: null,
+            isAuthLoading: true,
 
             setUser: (userData) => 
                 set({
@@ -16,12 +17,19 @@ const userAuthStore = create(
                 }),
             
 
-            logout: () => 
-                set({
-                    user: null,
-                    isAuthenticated: false,
-                    accessToken: null,
-                }),
+            logout: async () => {
+                try {
+                    await api.post('auth/logout');
+                } catch (error) {
+                    console.log(error.response?.data || error);
+                } finally {
+                    set({
+                        user: null,
+                        isAuthenticated: false,
+                        accessToken: null,
+                    });
+                }
+            },
 
             setAccessToken: (token) => {
                 set({
@@ -69,6 +77,31 @@ const userAuthStore = create(
                 }catch(error){
                     console.log(error.response?.data || error);
                     throw error
+                }
+            },
+
+            refresh: async () => {
+                try{
+                    set({
+                        isAuthLoading: true
+                    })
+                    const response = await api.get('auth/refresh');
+                    set({
+                        accessToken: response.data.data.accessToken,
+                        isAuthenticated: true
+                    })
+                }catch(error){
+                    set({
+                        user: null,
+                        accessToken: null,
+                        isAuthenticated: false
+                    })
+
+                    throw error
+                }finally{
+                    set({
+                        isAuthLoading: false
+                    })
                 }
             }
             
