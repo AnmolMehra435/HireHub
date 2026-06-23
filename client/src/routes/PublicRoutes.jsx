@@ -7,7 +7,7 @@ function PublicRoute(){
         state.user);
 
     if(isAuthenticated){
-        switch(user.role){
+        switch(user?.role){
             case "admin":
                 return (<Navigate to='/admin/dashboard' replace />)
             
